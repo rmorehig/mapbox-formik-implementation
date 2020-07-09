@@ -1,31 +1,25 @@
 import React from 'react'
+import { Field, Form, useFormikContext } from 'formik'
 
-const eventName = 'onDrag'
-
-const ControlPanel = ({ events = {} }) => {
-  const renderEvent = eventName => {
-    const lngLat = events[eventName]
-    return (
-      <>
-        <div>
-          <label>
-            Longitude <input>{lngLat?.[0]}</input>
-          </label>
-        </div>
-        <div>
-          <label>
-            Latitude
-            <input value={lngLat?.[1]} />
-          </label>
-        </div>
-      </>
-    )
+const ControlPanel = ({ setMarkerUpdated }) => {
+  const { setFieldValue } = useFormikContext()
+  const handleChange = event => {
+    setFieldValue(event.target.name, Number(event.target.value))
+    setMarkerUpdated(true)
   }
-
   return (
     <div className="control-panel">
       <h3>Coordinates</h3>
-      <div>{renderEvent(eventName)}</div>
+      <Form>
+        <label>
+          Longitude <Field name="longitude" onChange={handleChange} />
+        </label>
+
+        <label>
+          Latitude
+          <Field name="latitude" onChange={handleChange} />
+        </label>
+      </Form>
     </div>
   )
 }

@@ -1,8 +1,13 @@
-import React, { useState, useCallback } from 'react'
-import MapGL, { Marker, NavigationControl } from 'react-map-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import React, { useState, useCallback, useEffect } from 'react'
+import MapGL, {
+  Marker,
+  NavigationControl,
+  FlyToInterpolator
+} from 'react-map-gl'
+import { useFormikContext } from 'formik'
 import Pin from './Pin'
 import ControlPanel from './ControlPanel'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 const initialViewport = {
   latitude: 37.785164,
@@ -14,12 +19,11 @@ const initialViewport = {
 
 const Map = () => {
   const [viewport, setViewport] = useState(initialViewport)
-  const [marker, setMarker] = useState({
-    latitude: 37.785164,
-    longitude: -100
-  })
-
-  const [events, setEvents] = useState({})
+  const [markerUpdated, setMarkerUpdated] = useState(false)
+  const {
+    setFieldValue,
+    values: { longitude, latitude }
+  } = useFormikContext()
 
   const updateViewport = useCallback(
     viewport => {
@@ -27,20 +31,35 @@ const Map = () => {
     },
     [setViewport]
   )
-  const logDragEvent = (name, event) => {
-    setEvents(events => ({
-      ...events,
-      [name]: event.lngLat
-    }))
+  const handleDrag = event => {
+    setFieldValue('longitude', event.lngLat[0])
+    setFieldValue('latitude', event.lngLat[1])
   }
 
-  const handleDrag = event => {
-    logDragEvent('onDrag', event)
-    setMarker({
-      longitude: event.lngLat[0],
-      latitude: event.lngLat[1]
-    })
+  const handleDragEnd = () => {
+    setMarkerUpdated(true)
   }
+
+  useEffect(() => {
+    if (markerUpdated) {
+      setMarkerUpdated(false)
+      const newViewport = {
+        ...viewport,
+        longitude,
+        latitude,
+        transitionDuration: 1000,
+        transitionInterpolator: new FlyToInterpolator()
+      }
+      updateViewport(newViewport)
+    }
+  }, [
+    markerUpdated,
+    setMarkerUpdated,
+    longitude,
+    latitude,
+    updateViewport,
+    viewport
+  ])
 
   return (
     <div className="map-container">
@@ -53,19 +72,24 @@ const Map = () => {
         onViewportChange={updateViewport}
       >
         <Marker
-          longitude={marker.longitude}
-          latitude={marker.latitude}
+          longitude={longitude}
+          latitude={latitude}
           offsetTop={-20}
           offsetLeft={-10}
           draggable
           onDrag={handleDrag}
+          onDragEnd={handleDragEnd}
         >
           <Pin size={20} />
         </Marker>
         <div className="nav">
           <NavigationControl onViewportChange={updateViewport} />
         </div>
-        <ControlPanel events={events} />
+        <ControlPanel
+          longitude={longitude}
+          latitude={latitude}
+          setMarkerUpdated={setMarkerUpdated}
+        />
       </MapGL>
     </div>
   )
