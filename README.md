@@ -1,3 +1,5 @@
 # mapbox-formik-implementation
 
-Sample of saving the coordinates of a mapbox marker in a form field
+Example of how to handle coordinates in mapbox through a formik form.
+
+Live demo: https://mapbox-formik.vercel.app
