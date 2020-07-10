@@ -36,6 +36,19 @@ code {
   position: absolute;
   top: 20px;
   right: 20px;
-  width: 320px;
+  width: 200px;
   padding: 16px;
+}
+
+.control-panel h3 {
+  margin: 0;
+}
+.control-panel label {
+  display: block;
+  margin-top: 16px;
+}
+
+.control-panel input {
+  margin-top: 8px;
+  width: 100%;
 }

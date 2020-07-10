@@ -1,30 +1,21 @@
 import React from 'react'
 import { Field, Form, useFormikContext } from 'formik'
-
-const fixCoordinates = ({ latitude, longitude }) => {
-  if (latitude > 90) {
-    return 90
-  }
-  if (latitude < -90) {
-    return -90
-  }
-  if (longitude > 180) {
-    return 180
-  }
-  if (longitude < -180) {
-    return -180
-  }
-  return latitude || longitude
-}
+import { fixCoordinates } from 'utils/map'
 
 const ControlPanel = ({ setMarkerUpdated }) => {
   const { setFieldValue } = useFormikContext()
+
   const handleChange = event => {
-    const latitude = fixCoordinates({
-      [event.target.name]: Number(event.target.value)
+    const type = event.target.name
+    const value = fixCoordinates({
+      type,
+      value: event.target.value
     })
-    setFieldValue(event.target.name, latitude)
-    setMarkerUpdated(true)
+
+    if (!Number.isNaN(event.target.value)) {
+      setFieldValue(type, value)
+      setMarkerUpdated(true)
+    }
   }
   return (
     <div className="control-panel">
