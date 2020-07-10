@@ -1,4 +1,4 @@
-const checkLatitude = latitude => {
+export const checkLatitude = latitude => {
   if (latitude > 90) {
     return 90
   }
@@ -8,7 +8,7 @@ const checkLatitude = latitude => {
   return latitude
 }
 
-const checkLongitude = longitude => {
+export const checkLongitude = longitude => {
   if (longitude > 180) {
     return 180
   }
